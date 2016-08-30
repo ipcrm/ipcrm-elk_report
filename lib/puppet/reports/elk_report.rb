@@ -76,7 +76,7 @@ Puppet::Reports.register_report(:elk_report) do
         body: {
          puppet_configuration_version: "config version #{self.configuration_version}",
          puppet_environment: self.environment,
-         puppet_message: messages,
+         puppet_message: messages.join("\n"),
          puppet_version: "#{self.puppet_version}",
          puppet_status: self.status,
          puppet_host: self.host,

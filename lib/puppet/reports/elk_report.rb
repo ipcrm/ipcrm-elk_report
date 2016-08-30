@@ -33,7 +33,7 @@ Puppet::Reports.register_report(:elk_report) do
       self.resource_statuses.each do |k,v|
         resource_body = Hash.new
         resource_body["puppet_host"]      = self.host
-        resource_body["puppet_path"]      = "#{v.resource_type.capitalize}[#{v.title}]"
+        resource_body["puppet_resource"]      = "#{v.resource_type.capitalize}[#{v.title}]"
         resource_body["puppet_time"]      = v.time
         resource_body["puppet_tags"]      = v.tags
         resource_body["puppet_eval_time"] = v.evaluation_time

@@ -7,12 +7,19 @@ Puppet::Reports.register_report(:elk_report) do
   desc "Send reports to ELK stack"
 
   def process
+    # Check if config exists
+    confdir = Puppet.settings.values(nil, :main).interpolate(:confdir)
+    if not File.exists?("#{confdir}/elk_report.yaml")
+      Puppet.notice("ELK Report config file not present @ #{confdir}/elk_report.yaml, skipping...")
+      return
+    end
+
     # Load config
     begin
-      confdir = Puppet.settings.values(nil, :main).interpolate(:confdir)
       conf = YAML.load_file("#{confdir}/elk_report.yaml")
 
       # Create Connnection Object with Elasticsearch
+      Puppet.debug("ELK Report creating connection to Elasticsearch @ #{conf['host']}")
       client = Elasticsearch::Client.new hosts: {
         host: conf.fetch('host'),
         port: conf.fetch('port',nil),
@@ -22,6 +29,7 @@ Puppet::Reports.register_report(:elk_report) do
       }
 
       # Create a new document for each resource that was managed
+      Puppet.debug("ELK Report create a new ElasticSearch document for each Puppet Resource")
       self.resource_statuses.each do |k,v|
         resource_body = Hash.new
         resource_body["puppet_host"]      = self.host
@@ -54,6 +62,7 @@ Puppet::Reports.register_report(:elk_report) do
       end
 
       # Create new document for the log view of the run
+      Puppet.debug("ELK Report create a new Elasticsearch document for this Puppet transaction")
       messages = Array.new
       self.logs.each_with_index do |l,i|
         message = "#{l.level.capitalize}: "

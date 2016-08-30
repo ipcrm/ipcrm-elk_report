@@ -7,7 +7,7 @@ class elk_report (
   ini_setting { 'puppet agent reports':
     ensure  => present,
     path    => $::settings::config,
-    section => 'agent',
+    section => 'main',
     setting => 'reports',
     value   => 'elk_report',
   }

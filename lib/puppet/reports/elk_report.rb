@@ -63,14 +63,12 @@ Puppet::Reports.register_report(:elk_report) do
 
       # Create new document for the log view of the run
       Puppet.notice("ELK Report: #{self.host} - create a new Elasticsearch document for this Puppet transaction")
-      logs = Hash.new
-      count = 0
+      logs = Array.new
       self.logs.each_with_index do |l,i|
         log = "#{l.level.capitalize}: "
         log << "#{l.source}: " if l.source and l.source != 'Puppet'
         log << l.message
-        logs["%03d" % count] = log
-        count+=1
+        logs << log
       end
 
       client.create index: "puppet-#{Time.now.utc.to_date}",
@@ -78,7 +76,7 @@ Puppet::Reports.register_report(:elk_report) do
         body: {
          configuration_version: "config version #{self.configuration_version}",
          environment: self.environment,
-         log_entry: logs,
+         log: logs.join("\n"),
          agent_version: "#{self.puppet_version}",
          status: self.status,
          host: self.host,

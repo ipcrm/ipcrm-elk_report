@@ -88,7 +88,7 @@ Puppet::Reports.register_report(:elk_report) do
         }
 
     rescue Exception => e
-      Puppet.err('Failed to process elk_report!')
+      Puppet.err("Failed to process elk_report! #{e}\n#{e.backtrace}")
       Puppet.err(e.message)
     end
 

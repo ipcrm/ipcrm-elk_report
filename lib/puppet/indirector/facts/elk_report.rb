@@ -33,7 +33,7 @@ class Puppet::Node::Facts::Elk_report < Puppet::Node::Facts::Puppetdb
         type: 'log',
         body: {
          host: request.key,
-         fact: request.instance.values,
+         facts: request.instance.values,
          tags: ['puppet', 'puppet_fact'],
          published: true,
          published_at: Time.now.utc.iso8601,

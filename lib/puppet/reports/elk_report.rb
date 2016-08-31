@@ -69,7 +69,7 @@ Puppet::Reports.register_report(:elk_report) do
         message = "#{l.level.capitalize}: "
         message << "#{l.source}: " if l.source and l.source != 'Puppet'
         message << l.message
-        messages[count] = message
+        messages["%03d" % count] = message
         count+=1
       end
 

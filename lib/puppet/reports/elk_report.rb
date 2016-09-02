@@ -24,17 +24,21 @@ Puppet::Reports.register_report(:elk_report) do
       # IF ANY resources are noop but did not simulate a change (ie no drift) - the status of the run is unchanged
       global_status = :unchanged
 
-      metrics = Hash.new
-      self.metrics['events'].values.each do |r|
-        metrics[r[0]] = r[2]
-      end
+      if self.metrics.has_key?('events')
+        metrics = Hash.new
+        self.metrics['events'].values.each do |r|
+          metrics[r[0]] = r[2]
+        end
 
-      if metrics.has_key?('noop') && metrics['success'] == 0 && metrics['failure'] == 0
-        global_status = :noop
-      elsif metrics['success'] > 0
-        global_status = :changed
-      elsif metrics['failure'] > 0
-        global_status = :failed
+        if metrics.has_key?('noop') && metrics['success'] == 0 && metrics['failure'] == 0
+          global_status = :noop
+        elsif metrics['success'] > 0
+          global_status = :changed
+        elsif metrics['failure'] > 0
+          global_status = :failed
+        end
+      else
+        global_status = self.status
       end
 
       # Load Conf file

@@ -16,6 +16,28 @@ Puppet::Reports.register_report(:elk_report) do
 
     # Load config
     begin
+      # Set Run status - start by assuming 
+      # Trying to make this reporting mimic the behavior of the console
+      # IF a resource is in noop, and another resource is changed (ie you set a resource level noop),
+      # the status of the run is reported as changed
+      # IF ALL resources are noop (ie you passed the noop flag) - the status of the run is reported as noop
+      # IF ANY resources are noop but did not simulate a change (ie no drift) - the status of the run is unchanged
+      global_status = :unchanged
+
+      metrics = Hash.new
+      self.metrics['events'].values.each do |r|
+        metrics[r[0]] = r[2]
+      end
+
+      if metrics.has_key?('noop') && metrics['success'] == 0 && metrics['failure'] == 0
+        global_status = :noop
+      elsif metrics['success'] > 0
+        global_status = :changed
+      elsif metrics['failure'] > 0
+        global_status = :failed
+      end
+
+      # Load Conf file
       conf = YAML.load_file("#{confdir}/elk_report.yaml")
 
       # Create Connnection Object with Elasticsearch
@@ -78,7 +100,7 @@ Puppet::Reports.register_report(:elk_report) do
          environment: self.environment,
          log: logs.join("\n"),
          agent_version: "#{self.puppet_version}",
-         status: self.status,
+         status: global_status,
          host: self.host,
          time: self.time,
          type: self.kind,

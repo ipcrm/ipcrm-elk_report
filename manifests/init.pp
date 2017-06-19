@@ -27,7 +27,7 @@ class elk_report (
   }
 
   # Configure Puppet to use elk_report setting
-  pe_ini_subsetting { 'reports_elk_report' :
+  ini_subsetting { 'reports_elk_report' :
     ensure               => present,
     path                 => "${::settings::confdir}/puppet.conf",
     section              => 'master',

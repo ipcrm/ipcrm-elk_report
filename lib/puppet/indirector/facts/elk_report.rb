@@ -29,7 +29,7 @@ class Puppet::Node::Facts::Elk_report < Puppet::Node::Facts::Puppetdb
       }
 
 
-      Puppet.debug "Request.instance.values type - #{request.instance.values.class}"
+      Puppet.info "Request.instance.values type - #{request.instance.values.class}"
       Puppet.info "Submitting facts to ElasticSearch at #{conf['host']}"
       client.create index: "puppet_facts-#{Time.now.utc.to_date}",
         type: 'log',

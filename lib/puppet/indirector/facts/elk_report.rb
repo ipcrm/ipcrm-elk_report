@@ -31,7 +31,7 @@ class Puppet::Node::Facts::Elk_report < Puppet::Node::Facts::Puppetdb
       Puppet.info "Request.instance.values type - #{request.instance.values.class}"
       newvalues = Hash[ request.instance.values.map {|k,v|
           if v.class == Hash
-            new_v = Hash [ v.map {|vk,vv| [vk.gsub(/\./,'_'),vv]} ]
+            new_v = Hash[ v.map {|j,h| [ j.gsub(/\./,'_'),h ]} ]
             [k.gsub(/\./,'_'),new_v]
           else
             [k.gsub(/\./,'_'),v]

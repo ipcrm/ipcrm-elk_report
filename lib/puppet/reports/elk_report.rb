@@ -56,10 +56,11 @@ Puppet::Reports.register_report(:elk_report) do
 
       # Create a new document for each resource that was managed
       Puppet.notice("ELK Report: #{self.host} - create a new ElasticSearch document for each Puppet Resource")
+
       self.resource_statuses.each do |k,v|
         resource_body = Hash.new
         resource_body["host"]         = self.host
-        resource_body["resource"]     = "#{v.resource_type.capitalize}[#{v.title}]"
+        resource_body["resource"]     = "#{v.resource_type.capitalize}[#{v.title.gsub(/\./,"_")}]"
         resource_body["time"]         = v.time
         resource_body["tags"]         = v.tags
         resource_body["eval_time"]    = v.evaluation_time

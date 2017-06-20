@@ -6,7 +6,6 @@ class Puppet::Node::Facts::Elk_report < Puppet::Node::Facts::Puppetdb
   desc "Save facts to ElasticSearchand PuppetDB.
        It uses PuppetDB to retrieve facts for catalog compilation."
 
-
   def save(request)
     # Check if config exists
     confdir = Puppet.settings.values(nil, :main).interpolate(:confdir)
@@ -30,7 +29,15 @@ class Puppet::Node::Facts::Elk_report < Puppet::Node::Facts::Puppetdb
 
 
       Puppet.info "Request.instance.values type - #{request.instance.values.class}"
-      newvalues = Hash[ request.instance.values.map {|k,v| [k.gsub(/\./,'_'),v] } ]
+      newvalues = Hash[ request.instance.values.map {|k,v|
+          if v.class == Hash
+            new_v = Hash [ v.map {|vk,vv| [vk.gsub(/\./,'_'),vv]} ]
+            [k.gsub(/\./,'_'),new_v]
+          else
+            [k.gsub(/\./,'_'),v]
+          end
+        }
+      ]
 
 
       Puppet.info "Submitting facts to ElasticSearch at #{conf['host']}"

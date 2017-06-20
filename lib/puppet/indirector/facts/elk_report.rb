@@ -30,12 +30,15 @@ class Puppet::Node::Facts::Elk_report < Puppet::Node::Facts::Puppetdb
 
 
       Puppet.info "Request.instance.values type - #{request.instance.values.class}"
+      newvalues = Hash[ request.instance.values.map {|k,v| [k.gsub(/\./,'_'),v] } ]
+
+
       Puppet.info "Submitting facts to ElasticSearch at #{conf['host']}"
       client.create index: "puppet_facts-#{Time.now.utc.to_date}",
         type: 'log',
         body: {
          host: request.key,
-         facts: request.instance.values,
+         facts: newvalues,
          tags: ['puppet', 'puppet_fact'],
          published: true,
          published_at: Time.now.utc.iso8601,

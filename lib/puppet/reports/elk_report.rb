@@ -98,6 +98,12 @@ Puppet::Reports.register_report(:elk_report) do
         logs << log
       end
 
+      if Puppet.version <= '5.0.0'
+        body_type = self.kind
+      else
+        body_type = 'unavailable'
+      end
+
       client.create index: "puppet-#{Time.now.utc.to_date}",
         type: 'log',
         body: {
@@ -108,7 +114,7 @@ Puppet::Reports.register_report(:elk_report) do
          status: global_status,
          host: self.host,
          time: self.time,
-         type: self.kind,
+         type: body_type,
          tags: ['puppet', 'puppet_log'],
          published: true,
          published_at: Time.now.utc.iso8601,
